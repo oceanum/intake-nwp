@@ -76,13 +76,10 @@ class NWPSource(DataSourceMixin):
         self.mapping = mapping
         self.sorted = sorted
 
-        # Convert lead times to the expected format
-        if isinstance(fxx, dict):
-            fxx = [int(v) for v in np.arange(**fxx)]
-        self.fxx = fxx
+        self._fxx = fxx
+        self._stepback = 0
 
         # Set latest available cycle
-        self._stepback = 0
         self._latest = round_time(datetime.utcnow(), hour_resolution=self.cycle_step)
 
         self._ds = None
@@ -93,6 +90,15 @@ class NWPSource(DataSourceMixin):
             f"product='{self.product}', pattern='{self.pattern}', "
             f"priority={self.priority}>"
         )
+
+    @property
+    def fxx(self):
+        """Convert lead times to the expected format."""
+        if isinstance(self._fxx, dict):
+            # Haven't figure out how to pass parameters as integers yet
+            self._fxx = {k: int(v) for k, v in self._fxx.items()}
+            self._fxx = [int(v) for v in np.arange(**self._fxx)]
+        return self._fxx
 
     def _set_latest_cycle(self):
         """Set cycle from the latest data available if cycle is not specified."""

@@ -3,7 +3,6 @@ version: '2'
 services:
 
   intake-nwp:
-    # image: registry.gitlab.com/oceanum/intake/intake-nwp:$CI_COMMIT_REF_NAME
     image: intake-nwp
     build:
       context: ./

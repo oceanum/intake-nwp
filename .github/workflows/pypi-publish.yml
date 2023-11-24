@@ -23,7 +23,7 @@ jobs:
     -
       name: Install dependencies
       run: |
-        apt install libeccodes-dev
+        sudo apt install libeccodes-dev
         python -m pip install --upgrade pip
         pip install . 'intake-nwp[test]'
     -

@@ -6,6 +6,8 @@ from typing import Union
 from intake_nwp.source import DataSourceMixin
 from intake_nwp.utils import round_time
 
+# from intake_xarray.base import DataSourceMixin
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +29,7 @@ class NWPSource(DataSourceMixin):
     cycle_step: int
         The interval between cycles in hours for retaining the latest cycle available.
     stepback: int
-        The number of cycles to step back to find the latest available cycle.
+        The maximum number of cycles to step back to find the latest available cycle.
     priority: list[str]
         List of model sources to get the data in the order of download priority.
     mapping: dict
@@ -40,7 +42,7 @@ class NWPSource(DataSourceMixin):
     Notes
     -----
     * If fxx is a dict it is expected to have the keys 'start', 'stop', and 'step' to
-      define the forecast lead time range from numpy.arange.
+      define the forecast lead time range from `numpy.arange`.
     * A ValueError exception is raised if the lead time defined by cycle and fxx is not
       entirely available.
 
@@ -63,6 +65,8 @@ class NWPSource(DataSourceMixin):
         metadata: dict = None,
         **kwargs
     ):
+        super().__init__(metadata=metadata, **kwargs)
+
         self.model = model
         self.product = product
         self.pattern = pattern
@@ -73,17 +77,16 @@ class NWPSource(DataSourceMixin):
         self.mapping = mapping
         self.sorted = sorted
 
+        # Convert lead times to the expected format
         if isinstance(fxx, dict):
             fxx = [int(v) for v in np.arange(**fxx)]
         self.fxx = fxx
 
         # Set latest available cycle
         self._stepback = 0
-        self._cycle = round_time(datetime.utcnow(), hour_resolution=self.cycle_step)
-        self._set_latest_cycle()
+        self._latest = round_time(datetime.utcnow(), hour_resolution=self.cycle_step)
 
         self._ds = None
-        super().__init__(metadata=metadata, **kwargs)
 
     def __repr__(self):
         return (
@@ -96,32 +99,37 @@ class NWPSource(DataSourceMixin):
         """Set cycle from the latest data available if cycle is not specified."""
         from herbie import Herbie
 
-        if self.cycle is not None:
+        if self.cycle:
             return self.cycle
 
+        # Inspect data for latest cycle, step back if not found up to stepback limit
         f = Herbie(
-            date=self._cycle,
+            date=self._latest,
             model=self.model,
             fxx=0,
             product=self.product,
             priority=self.priority,
         )
         try:
-            # Inventory will raise ValueError if no data is found
+            # Inventory raises a ValueError if no data can be found
             f.inventory(self.pattern)
-            self.cycle = self._cycle
+            self.cycle = self._latest
         except ValueError:
+            # Step back a cycle only if stepback limit is not reached
             if self._stepback >= self.stepback:
                 raise ValueError(
                     f"No data found after {self.stepback} stepbacks for the given "
                     f"parameters: {self}"
                 )
             self._stepback += 1
-            self._cycle -= timedelta(hours=self.cycle_step)
+            self._latest -= timedelta(hours=self.cycle_step)
             return self._set_latest_cycle()
 
     def _open_dataset(self):
         from herbie import FastHerbie
+
+        # Set latest cycle if not specified
+        self._set_latest_cycle()
 
         fh = FastHerbie(
             [self.cycle],
@@ -132,12 +140,22 @@ class NWPSource(DataSourceMixin):
         )
         for obj in fh.objects:
             logger.debug(obj)
+
+        # Throw more meaningful error if no data found
         try:
             logger.debug(f"Inventory:\n{fh.inventory(self.pattern)}")
         except ValueError as e:
             raise ValueError(f"No data found for the given parameters: {self}") from e
 
+        # Open the xarray dataset
         ds = fh.xarray(self.pattern, remove_grib=True)
+
+        # Ensure single dataset is returned
+        if isinstance(ds, list):
+            raise ValueError(
+                f"The given parameters: {self} returned multiple datasets that cannot "
+                f"be concatenated, please review your selected pattern: {self.pattern}"
+            )
 
         # Turn step index into time index
         ds = ds.assign_coords({"step": ds.valid_time}).drop(["time", "valid_time"])
@@ -151,10 +169,12 @@ class NWPSource(DataSourceMixin):
                 f"Data not available for the requested forecast lead time for {self}, "
                 f"requested: {times[0]} - {t1}, available: {times[0]} - {times[-1]}"
             )
-        # Sortby
+
+        # Sorting
         if self.sorted:
             for coord in ds.coords:
                 ds = ds.sortby(coord)
+
         # Renaming
         ds = ds.rename(self.mapping)
 

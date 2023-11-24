@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "intake_nwp"
+name = "intake-nwp"
 description = "Intake drivers for numerical weather prediction data"
 readme = "README.rst"
 license = { file = "LICENSE" }
@@ -65,7 +65,7 @@ intake_nwp = "intake_nwp.cli:main"
 version = {attr = "intake_nwp.__version__"}
 
 [tool.setuptools.packages.find]
-exclude = ["tests", "docs"]
+exclude = ["tests", "docs", "notebooks"]
 
 [tool.distutils.bdist_wheel]
 universal = true

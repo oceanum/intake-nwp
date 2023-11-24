@@ -1,9 +1,8 @@
 name: Upload Python Package
 
 on:
-  push
-  # release:
-  #   types: [published]
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -35,9 +34,9 @@ jobs:
       run: |
         pip install build
         python -m build -s
-    # -
-    #   name: Publish package
-    #   uses: pypa/gh-action-pypi-publish@v1.8.1
-    #   with:
-    #     password: ${{ secrets.PYPI_API_TOKEN }}
-    #     verbose: true
+    -
+      name: Publish package
+      uses: pypa/gh-action-pypi-publish@v1.8.1
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        verbose: true

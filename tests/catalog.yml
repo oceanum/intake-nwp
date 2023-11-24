@@ -1,0 +1,32 @@
+metadata:
+  version: 1
+
+sources:
+  gfs_icec:
+    driver: nwp
+    description: GFS sea ice concentration 0.25 degree
+    metadata:
+      name: GFS icec 0.25 degree
+      tags:
+        - sea ice concentration
+        - gfs
+        - 0.25 degree
+    args:
+      cycle: 20231122T00
+      model: gfs
+      fxx:
+        start: 0
+        stop: 6
+        step: 1
+      product: pgrb2.0p25
+      pattern: ICEC
+      priority:
+        - google
+        - aws
+        - nomads
+        - azure
+      mapping:
+        longitude: lon
+        latitude: lat
+        siconc: icecsfc
+      sorted: True

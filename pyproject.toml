@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intake_nwp"
+description = "Intake drivers for numerical weather prediction data"
+readme = "README.rst"
+license = { file = "LICENSE" }
+keywords = ["nwp", "intake", "model", "download"]
+authors = [
+  { name = "Oceanum Developers", email="developers@oceanum.science" },
+]
+maintainers = [
+  { name = "Oceanum Developers", email = "developers@oceanum.science" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+requires-python = ">=3.8"
+dependencies = [
+  "click",
+  "cartopy",
+  "cfgrib",
+  "herbie-data",
+  "intake",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+]
+extra = [
+]
+docs = [
+  "pydata-sphinx-theme",
+  "sphinx",
+  "sphinxcontrib-programoutput",
+]
+
+[project.urls]
+"Homepage" = "https://oceanum.io/"
+"Source" = "https://github.com/oceanum-io/intake-nwp"
+"Tracker" = "https://github.com/oceanum-io/intake-nwp/issues"
+
+[project.scripts]
+intake_nwp = "intake_nwp.cli:main"
+
+[project.entry-points."intake.drivers"]
+"nwp" = "intake_nwp.source:NWPSource"
+
+[tool.setuptools.dynamic]
+version = {attr = "intake_nwp.__version__"}
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "docs"]
+
+[tool.distutils.bdist_wheel]
+universal = true
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"

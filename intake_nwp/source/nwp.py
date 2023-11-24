@@ -6,7 +6,6 @@ from typing import Union
 from intake_nwp.source import DataSourceMixin
 from intake_nwp.utils import round_time
 
-# from intake_xarray.base import DataSourceMixin
 
 logger = logging.getLogger(__name__)
 

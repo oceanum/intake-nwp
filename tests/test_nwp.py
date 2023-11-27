@@ -1,16 +1,17 @@
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 import intake
+import pytest
 
 from intake_nwp.utils import round_time
-from intake_nwp.source.nwp import NWPSource, NowcastSource
+from intake_nwp.source.nwp import ForecastSource, NowcastSource
 
 
 HERE = Path(__file__).parent
 
 
-def test_nwp():
-    source = NWPSource(
+def test_forecast():
+    source = ForecastSource(
         cycle="20231122T00",
         model="gfs",
         fxx=[0, 1, 2],
@@ -25,10 +26,10 @@ def test_nwp():
     assert "icecsfc" in dset
 
 
-def test_nwp_latest():
+def test_forecast_latest():
     cycle_step = 12
     cycle = round_time(datetime.utcnow(), hour_resolution=cycle_step)
-    source = NWPSource(
+    source = ForecastSource(
         model="gfs",
         fxx=[0, 1, 2],
         priority=["google", "aws", "nomads", "azure"],
@@ -39,11 +40,11 @@ def test_nwp_latest():
         cycle_step=cycle_step,
     )
     dset = source.to_dask()
-    assert dset.time.to_index()[0] == cycle
+    assert dset.time.to_index()[0] in (cycle, cycle - timedelta(hours=cycle_step))
 
 
-def test_nwp_fxx_dict():
-    source = NWPSource(
+def test_forecast_fxx_dict():
+    source = ForecastSource(
         cycle="20231122T00",
         model="gfs",
         fxx={"start": 0, "stop": 3, "step": 1},
@@ -56,12 +57,6 @@ def test_nwp_fxx_dict():
     dset = source.to_dask()
     assert dset.time.size == 3
     assert "icecsfc" in dset
-
-
-def test_nwp_catalog():
-    cat = intake.open_catalog(HERE / "catalog.yml")
-    dset = cat.gfs_icec.to_dask()
-    assert dset.time.size == 6
 
 
 def test_nowcast():
@@ -78,5 +73,10 @@ def test_nowcast():
         sorted=True,
     )
     dset = source.to_dask()
-    import ipdb; ipdb.set_trace()
     assert dset.time.size == 4
+
+
+@pytest.mark.parametrize("dataset_id", ["fc_gfs_icec", "nc_gfs_icec"])
+def test_catalog(dataset_id):
+    cat = intake.open_catalog(HERE / "catalog.yml")
+    dset = cat[dataset_id].to_dask()

@@ -11,7 +11,7 @@ from intake_nwp.utils import round_time
 logger = logging.getLogger(__name__)
 
 
-class NWPSource(DataSourceMixin):
+class ForecastSource(DataSourceMixin):
     """Forecast data source.
 
     This driver opens a forecast dataset using the Herbies package.
@@ -50,7 +50,7 @@ class NWPSource(DataSourceMixin):
 
     """
 
-    name = "nwp"
+    name = "forecast"
 
     def __init__(
         self,

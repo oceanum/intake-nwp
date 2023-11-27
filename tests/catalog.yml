@@ -2,15 +2,16 @@ metadata:
   version: 1
 
 sources:
-  gfs_icec:
-    driver: nwp
-    description: GFS sea ice concentration 0.25 degree
+  fc_gfs_icec:
+    driver: forecast
+    description: GFS sea ice concentration forecast 0.25 degree
     metadata:
-      name: GFS icec 0.25 degree
+      name: GFS icec forecast 0.25 degree
       tags:
         - sea ice concentration
         - gfs
         - 0.25 degree
+        - forecast
     args:
       cycle: 20231122T00
       model: gfs
@@ -19,6 +20,35 @@ sources:
         stop: 6
         step: 1
       product: pgrb2.0p25
+      pattern: ICEC
+      priority:
+        - google
+        - aws
+        - nomads
+        - azure
+      mapping:
+        longitude: lon
+        latitude: lat
+        siconc: icecsfc
+      sorted: True
+
+  nc_gfs_icec:
+    driver: nowcast
+    description: GFS sea ice concentration nowcast 0.5 degree
+    metadata:
+      name: GFS icec nowcast 0.5 degree
+      tags:
+        - sea ice concentration
+        - gfs
+        - 0.5 degree
+        - nowcast
+    args:
+      start: 20231101T00
+      stop: 20231102T00
+      cycle_step: 6
+      time_step: 3
+      model: gfs
+      product: pgrb2.0p50
       pattern: ICEC
       priority:
         - google

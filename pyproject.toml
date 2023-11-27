@@ -60,6 +60,7 @@ intake_nwp = "intake_nwp.cli:main"
 
 [project.entry-points."intake.drivers"]
 "nwp" = "intake_nwp.source:NWPSource"
+"nowcast" = "intake.nwp.source.NowcastSource"
 
 [tool.setuptools.dynamic]
 version = {attr = "intake_nwp.__version__"}

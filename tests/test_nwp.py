@@ -3,7 +3,7 @@ from datetime import datetime
 import intake
 
 from intake_nwp.utils import round_time
-from intake_nwp.source.nwp import NWPSource
+from intake_nwp.source.nwp import NWPSource, NowcastSource
 
 
 HERE = Path(__file__).parent
@@ -62,3 +62,21 @@ def test_nwp_catalog():
     cat = intake.open_catalog(HERE / "catalog.yml")
     dset = cat.gfs_icec.to_dask()
     assert dset.time.size == 6
+
+
+def test_nowcast():
+    source = NowcastSource(
+        start="20231101T00",
+        stop="20231101T09",
+        cycle_step=6,
+        time_step=3,
+        model="gfs",
+        product="pgrb2.0p50",
+        pattern="ICEC",
+        priority=["google", "aws", "nomads", "azure"],
+        mapping={"longitude": "lon", "latitude": "lat", "siconc": "icecsfc"},
+        sorted=True,
+    )
+    dset = source.to_dask()
+    import ipdb; ipdb.set_trace()
+    assert dset.time.size == 4

@@ -4,7 +4,6 @@ RUN echo "--------------- Installing system packages ---------------" &&\
     apt update && apt upgrade -y && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt -y install \
         curl \
-        git \
         libeccodes-dev \
         python3-pip && \
     apt clean all

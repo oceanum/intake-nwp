@@ -282,17 +282,19 @@ class NowcastSource(DataSourceMixin):
     @property
     def fxx(self):
         """Lead times to keep in each cycle."""
-        if self.time_step > self.cycle_step:
+        time_step = int(self.time_step)
+        cycle_step = int(self.cycle_step)
+        if time_step > cycle_step:
             raise ValueError(
-                f"Time step '{self.time_step}' must be less than or equal to cycle "
-                f"step '{self.cycle_step}'"
+                f"Time step '{time_step}' must be less than or equal to cycle "
+                f"step '{cycle_step}'"
             )
-        if self.cycle_step % self.time_step != 0:
+        if cycle_step % time_step != 0:
             raise ValueError(
-                f"Cycle step '{self.cycle_step}' must be a multiple of time step "
-                f"'{self.time_step}'"
+                f"Cycle step '{cycle_step}' must be a multiple of time step "
+                f"'{time_step}'"
             )
-        return [int(v) for v in np.arange(0, self.cycle_step, self.time_step)]
+        return [int(v) for v in np.arange(0, cycle_step, time_step)]
 
     def _set_latest_cycle(self):
         """Set cycle from the latest data available if stop is not specified."""

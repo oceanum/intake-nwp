@@ -57,18 +57,18 @@ class ForecastSource(DataSourceMixin):
 
     def __init__(
         self,
-        model: str,
-        fxx: Union[list[int], dict],
-        product: str,
-        pattern: str,
-        cycle: Union[str, datetime] = None,
-        cycle_step: int = 6,
-        stepback: int = 1,
-        priority: list[str] = ["google", "aws", "nomads", "azure"],
-        max_threads: Union[int, Literal["auto"]] = None,
-        mapping: dict = {},
-        sorted: bool = False,
-        metadata: dict = None,
+        model,
+        fxx,
+        product,
+        pattern,
+        cycle=None,
+        cycle_step=6,
+        stepback=1,
+        priority=["google", "aws", "nomads", "azure"],
+        max_threads=None,
+        mapping={},
+        sorted=False,
+        metadata=None,
         **kwargs
     ):
         super().__init__(metadata=metadata, **kwargs)
@@ -245,19 +245,19 @@ class NowcastSource(DataSourceMixin):
 
     def __init__(
         self,
-        model: str,
-        product: str,
-        pattern: str,
-        start: Union[str, datetime],
-        stop: Union[str, datetime] = None,
-        cycle_step: int = 6,
-        time_step: int = 1,
-        stepback: int = 1,
-        priority: list[str] = ["google", "aws", "nomads", "azure"],
-        max_threads: Union[int, Literal["auto"]] = None,
-        mapping: dict = {},
-        sorted: bool = False,
-        metadata: dict = None,
+        model,
+        product,
+        pattern,
+        start,
+        stop=None,
+        cycle_step=6,
+        time_step=1,
+        stepback=1,
+        priority=["google", "aws", "nomads", "azure"],
+        max_threads=None,
+        mapping={},
+        sorted=False,
+        metadata=None,
         **kwargs
     ):
         super().__init__(metadata=metadata, **kwargs)

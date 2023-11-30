@@ -35,6 +35,7 @@ dependencies = [
   "cfgrib",
   "herbie-data",
   "intake",
+  "psutil",
 ]
 dynamic = ["version"]
 

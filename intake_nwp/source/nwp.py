@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from typing import Union
+from typing import Union, Literal
 
 from intake_nwp.source import DataSourceMixin
 from intake_nwp.utils import round_time
@@ -40,6 +40,9 @@ class ForecastSource(DataSourceMixin):
         Sort the coordinates of the dataset.
     metadata: dict
         Extra metadata to add to data source.
+    max_threads: Optional[int, Literal["auto"]]
+        Maximum number of threads to use for parallel processing. If "auto", the number
+        of threads will be set to the number of cores on the machine.
 
     Notes
     -----
@@ -62,6 +65,7 @@ class ForecastSource(DataSourceMixin):
         cycle_step: int = 6,
         stepback: int = 1,
         priority: list[str] = ["google", "aws", "nomads", "azure"],
+        max_threads: Union[int, Literal["auto"]] = None,
         mapping: dict = {},
         sorted: bool = False,
         metadata: dict = None,
@@ -81,6 +85,7 @@ class ForecastSource(DataSourceMixin):
 
         self._fxx = fxx
         self._stepback = 0
+        self._max_threads = max_threads
 
         # Set latest available cycle
         self._latest = round_time(datetime.utcnow(), hour_resolution=self.cycle_step)
@@ -102,6 +107,14 @@ class ForecastSource(DataSourceMixin):
             self._fxx = {k: int(v) for k, v in self._fxx.items()}
             self._fxx = [int(v) for v in np.arange(**self._fxx)]
         return self._fxx
+
+    @property
+    def max_threads(self):
+        """Maximum number of threads to load xarray dataset."""
+        if self._max_threads == "auto":
+            import psutil
+            return psutil.cpu_count(logical=False)
+        return self._max_threads
 
     def _set_latest_cycle(self):
         """Set cycle from the latest data available if cycle is not specified."""
@@ -157,7 +170,11 @@ class ForecastSource(DataSourceMixin):
             raise ValueError(f"No data found for the given parameters: {self}") from e
 
         # Open the xarray dataset
-        ds = fh.xarray(self.pattern)
+        try:
+            ds = fh.xarray(self.pattern, max_threads=self.max_threads, remove_grib=True)
+        except TypeError as e:
+            logger.warning(f"Error using multithreading: {e}, trying without it")
+            ds = fh.xarray(self.pattern, max_threads=None, remove_grib=True)
 
         # Ensure single dataset is returned
         if isinstance(ds, list):
@@ -237,6 +254,7 @@ class NowcastSource(DataSourceMixin):
         time_step: int = 1,
         stepback: int = 1,
         priority: list[str] = ["google", "aws", "nomads", "azure"],
+        max_threads: Union[int, Literal["auto"]] = None,
         mapping: dict = {},
         sorted: bool = False,
         metadata: dict = None,
@@ -257,6 +275,7 @@ class NowcastSource(DataSourceMixin):
         self.sorted = sorted
 
         self._stepback = 0
+        self._max_threads = max_threads
 
         # Set latest available cycle
         self._latest = round_time(datetime.utcnow(), hour_resolution=self.cycle_step)
@@ -295,6 +314,14 @@ class NowcastSource(DataSourceMixin):
                 f"'{time_step}'"
             )
         return [int(v) for v in np.arange(0, cycle_step, time_step)]
+
+    @property
+    def max_threads(self):
+        """Maximum number of threads to load xarray dataset."""
+        if self._max_threads == "auto":
+            import psutil
+            return psutil.cpu_count(logical=False)
+        return self._max_threads
 
     def _set_latest_cycle(self):
         """Set cycle from the latest data available if stop is not specified."""
@@ -365,7 +392,11 @@ class NowcastSource(DataSourceMixin):
             raise ValueError(f"No data found for the given parameters: {self}") from e
 
         # Open the xarray dataset
-        ds = fh.xarray(self.pattern)
+        try:
+            ds = fh.xarray(self.pattern, max_threads=self.max_threads, remove_grib=True)
+        except TypeError as e:
+            logger.warning(f"Error using multithreading: {e}, trying without it")
+            ds = fh.xarray(self.pattern, max_threads=None, remove_grib=True)
 
         # Ensure single dataset is returned
         if isinstance(ds, list):

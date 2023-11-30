@@ -20,6 +20,7 @@ def test_forecast():
         pattern="ICEC",
         mapping={"longitude": "lon", "latitude": "lat", "siconc": "icecsfc"},
         sorted=True,
+        max_threads="auto",
     )
     dset = source.to_dask()
     assert dset.time.size == 3
@@ -38,6 +39,7 @@ def test_forecast_latest():
         mapping={"longitude": "lon", "latitude": "lat", "siconc": "icecsfc"},
         sorted=True,
         cycle_step=cycle_step,
+        max_threads="auto",
     )
     dset = source.to_dask()
     assert dset.time.to_index()[0] in (cycle, cycle - timedelta(hours=cycle_step))
@@ -53,6 +55,7 @@ def test_forecast_fxx_dict():
         pattern="ICEC",
         mapping={"longitude": "lon", "latitude": "lat", "siconc": "icecsfc"},
         sorted=True,
+        max_threads="auto",
     )
     dset = source.to_dask()
     assert dset.time.size == 3
@@ -71,6 +74,7 @@ def test_nowcast():
         priority=["google", "aws", "nomads", "azure"],
         mapping={"longitude": "lon", "latitude": "lat", "siconc": "icecsfc"},
         sorted=True,
+        max_threads="auto",
     )
     dset = source.to_dask()
     assert dset.time.size == 4

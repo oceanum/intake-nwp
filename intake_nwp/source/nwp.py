@@ -43,6 +43,9 @@ class ForecastSource(DataSourceMixin):
     max_threads: Optional[int, Literal["auto"]]
         Maximum number of threads to use for parallel processing. If "auto", the number
         of threads will be set to the number of cores on the machine.
+    check_inventory: bool
+        Check the inventory of the data source before opening the dataset to try to
+        catch errors earlier.
 
     Notes
     -----
@@ -69,6 +72,7 @@ class ForecastSource(DataSourceMixin):
         mapping={},
         sorted=False,
         metadata=None,
+        check_inventory=True,
         **kwargs
     ):
         super().__init__(metadata=metadata, **kwargs)
@@ -82,6 +86,7 @@ class ForecastSource(DataSourceMixin):
         self.priority = priority
         self.mapping = mapping
         self.sorted = sorted
+        self.check_inventory = check_inventory
 
         self._fxx = fxx
         self._stepback = 0
@@ -164,10 +169,11 @@ class ForecastSource(DataSourceMixin):
             logger.debug(obj)
 
         # Throw more meaningful error if no data found
-        try:
-            logger.debug(f"Inventory:\n{fh.inventory(self.pattern)}")
-        except ValueError as e:
-            raise ValueError(f"No data found for the given parameters: {self}") from e
+        if self.check_inventory:
+            try:
+                logger.debug(f"Inventory:\n{fh.inventory(self.pattern)}")
+            except ValueError as e:
+                raise ValueError(f"No data found for the parameters: {self}") from e
 
         # Open the xarray dataset
         try:

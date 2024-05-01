@@ -4,14 +4,14 @@ import pandas as pd
 from datetime import datetime, timedelta
 from typing import Union, Literal
 
-from intake_nwp.source import DataSourceMixin
+from intake_nwp.source import DataSourceBase
 from intake_nwp.utils import round_time
 
 
 logger = logging.getLogger(__name__)
 
 
-class ForecastSource(DataSourceMixin):
+class ForecastSource(DataSourceBase):
     """Forecast data source.
 
     This driver opens a forecast dataset using the Herbies package.
@@ -202,7 +202,7 @@ class ForecastSource(DataSourceMixin):
             )
 
         # Turn step index into time index
-        ds = ds.assign_coords({"step": ds.valid_time}).drop(["time", "valid_time"])
+        ds = ds.assign_coords({"step": ds.valid_time}).drop_vars(["time", "valid_time"])
         ds = ds.rename({"step": "time"}).reset_coords()
 
         # Ensure the entire lead time period requested is available
@@ -225,7 +225,7 @@ class ForecastSource(DataSourceMixin):
         self._ds = ds
 
 
-class NowcastSource(DataSourceMixin):
+class NowcastSource(DataSourceBase):
     """Nowcast data source.
 
     This driver opens a nowcast dataset using the Herbies package.
@@ -379,7 +379,7 @@ class NowcastSource(DataSourceMixin):
         # Convert time and step indices into single time index.
         ds = ds.stack(times=["time", "step"], create_index=False)
         ds = ds.assign_coords({"times": ds.time + ds.step}).transpose("times", ...)
-        ds = ds.drop(["time", "step", "valid_time"]).rename({"times": "time"})
+        ds = ds.drop_vars(["time", "step", "valid_time"]).rename({"times": "time"})
         ds = ds.reset_coords()
         # Sorting
         if self.sorted:

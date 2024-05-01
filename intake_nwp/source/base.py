@@ -1,11 +1,11 @@
 import logging
-from intake.source.base import CacheMixin, PersistMixin, DataSourceBase
+from intake.source.base import DataSource
 
 
 logger = logging.getLogger(__name__)
 
 
-class DataSourceMixin(CacheMixin, PersistMixin, DataSourceBase):
+class DataSourceBase(DataSource):
     """Base behaviours for plugins in this repo."""
 
     container = "xarray"
@@ -19,7 +19,7 @@ class DataSourceMixin(CacheMixin, PersistMixin, DataSourceBase):
             self._open_dataset()
 
             metadata = {
-                "dims": dict(self._ds.dims),
+                "dims": dict(self._ds.sizes),
                 "data_vars": {
                     k: list(self._ds[k].coords) for k in self._ds.data_vars.keys()
                 },

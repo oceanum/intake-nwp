@@ -73,6 +73,7 @@ class ForecastSource(DataSourceMixin):
         sorted=False,
         metadata=None,
         check_inventory=True,
+        verbose=False,
         **kwargs
     ):
         super().__init__(metadata=metadata, **kwargs)
@@ -87,6 +88,7 @@ class ForecastSource(DataSourceMixin):
         self.mapping = mapping
         self.sorted = sorted
         self.check_inventory = check_inventory
+        self.verbose=verbose
 
         self._fxx = fxx
         self._stepback = 0
@@ -139,7 +141,7 @@ class ForecastSource(DataSourceMixin):
         )
         try:
             # Inventory raises a ValueError if no data can be found
-            f.inventory(self.pattern)
+            f.inventory(self.pattern, verbose=self.verbose)
             self.cycle = self._latest
         except ValueError:
             # Step back a cycle only if stepback limit is not reached
@@ -177,10 +179,20 @@ class ForecastSource(DataSourceMixin):
 
         # Open the xarray dataset
         try:
-            ds = fh.xarray(self.pattern, max_threads=self.max_threads, remove_grib=True)
+            ds = fh.xarray(
+                self.pattern,
+                max_threads=self.max_threads,
+                remove_grib=True,
+                verbose=self.verbose,
+            )
         except TypeError as e:
             logger.warning(f"Error using multithreading: {e}, trying without it")
-            ds = fh.xarray(self.pattern, max_threads=None, remove_grib=True)
+            ds = fh.xarray(
+                self.pattern,
+                max_threads=None,
+                remove_grib=True,
+                verbose=self.verbose,
+            )
 
         # Ensure single dataset is returned
         if isinstance(ds, list):
@@ -263,6 +275,7 @@ class NowcastSource(DataSourceMixin):
         max_threads=None,
         mapping={},
         sorted=False,
+        verbose=False,
         metadata=None,
         **kwargs
     ):
@@ -279,6 +292,7 @@ class NowcastSource(DataSourceMixin):
         self.priority = priority
         self.mapping = mapping
         self.sorted = sorted
+        self.verbose = verbose
 
         self._stepback = 0
         self._max_threads = max_threads
@@ -347,7 +361,7 @@ class NowcastSource(DataSourceMixin):
         )
         try:
             # Inventory raises a ValueError if no data can be found
-            f.inventory(self.pattern)
+            f.inventory(self.pattern, verbose=self.verbose)
             self.stop = self._latest
         except ValueError:
             # Step back a cycle only if stepback limit is not reached
@@ -399,10 +413,20 @@ class NowcastSource(DataSourceMixin):
 
         # Open the xarray dataset
         try:
-            ds = fh.xarray(self.pattern, max_threads=self.max_threads, remove_grib=True)
+            ds = fh.xarray(
+                self.pattern,
+                max_threads=self.max_threads,
+                remove_grib=True,
+                verbose=self.verbose,
+            )
         except TypeError as e:
             logger.warning(f"Error using multithreading: {e}, trying without it")
-            ds = fh.xarray(self.pattern, max_threads=None, remove_grib=True)
+            ds = fh.xarray(
+                self.pattern,
+                max_threads=None,
+                remove_grib=True,
+                verbose=self.verbose,
+            )
 
         # Ensure single dataset is returned
         if isinstance(ds, list):

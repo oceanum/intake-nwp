@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "intake-nwp"
 description = "Intake drivers for numerical weather prediction data"
 readme = "README.rst"
-license = { file = "LICENSE" }
 keywords = ["nwp", "intake", "model", "download"]
 authors = [
   { name = "Oceanum Developers", email="developers@oceanum.science" },
@@ -15,47 +14,47 @@ maintainers = [
   { name = "Oceanum Developers", email = "developers@oceanum.science" },
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
-requires-python = ">=3.8"
+license = { file = "LICENSE" }
 dependencies = [
   "click",
   "cartopy",
   "cfgrib",
   "herbie-data",
   "intake",
-  "jinja2", # for intake2
+  "jinja2",
   "psutil",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-test = [
-  "pytest",
-]
-extra = [
-]
-docs = [
-  "pydata-sphinx-theme",
-  "sphinx",
-  "sphinxcontrib-programoutput",
+dev = [
+    "coverage",
+    "mypy",
+    "pytest",
+    "ruff",
+    "sphinx",
+    "tox",
+    "twine",
 ]
 
 [project.urls]
-"Homepage" = "https://oceanum.io/"
-"Source" = "https://github.com/oceanum-io/intake-nwp"
-"Tracker" = "https://github.com/oceanum-io/intake-nwp/issues"
+bugs = "https://github.com/oceanum/intake_nwp/issues"
+changelog = "https://github.com/oceanum/intake_nwp/blob/master/changelog.md"
+homepage = "https://github.com/oceanum/intake_nwp"
 
 [project.scripts]
 intake_nwp = "intake_nwp.cli:main"

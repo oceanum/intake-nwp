@@ -83,4 +83,4 @@ def test_nowcast():
 @pytest.mark.parametrize("dataset_id", ["fc_gfs_icec", "nc_gfs_icec"])
 def test_catalog(dataset_id):
     cat = intake.open_catalog(HERE / "catalog.yml")
-    dset = cat[dataset_id].to_dask()
+    cat[dataset_id].to_dask()

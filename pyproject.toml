@@ -60,10 +60,10 @@ homepage = "https://github.com/oceanum/intake_nwp"
 intake_nwp = "intake_nwp.cli:main"
 
 [project.entry-points."intake.drivers"]
-"nwp_forecast" = "intake_nwp.source:ForecastSource"
-"nwp_nowcast" = "intake_nwp.source:NowcastSource"
-"herbie_forecast" = "intake_nwp.source:ForecastSource"
-"herbie_nowcast" = "intake_nwp.source:NowcastSource"
+"nwp_forecast" = "intake_nwp.source.nwp:ForecastSource"
+"nwp_nowcast" = "intake_nwp.source.nwp:NowcastSource"
+"herbie_forecast" = "intake_nwp.source.nwp:ForecastSource"
+"herbie_nowcast" = "intake_nwp.source.nwp:NowcastSource"
 
 [tool.setuptools.dynamic]
 version = {attr = "intake_nwp.__version__"}

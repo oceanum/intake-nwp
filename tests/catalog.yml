@@ -3,7 +3,7 @@ metadata:
 
 sources:
   fc_gfs_icec:
-    driver: forecast
+    driver: nwp_forecast
     description: GFS sea ice concentration forecast 0.25 degree
     metadata:
       name: GFS icec forecast 0.25 degree
@@ -34,7 +34,7 @@ sources:
       sorted: True
 
   nc_gfs_icec:
-    driver: nowcast
+    driver: nwp_nowcast
     description: GFS sea ice concentration nowcast 0.5 degree
     metadata:
       name: GFS icec nowcast 0.5 degree

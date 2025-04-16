@@ -61,8 +61,10 @@ docs = [
 intake_nwp = "intake_nwp.cli:main"
 
 [project.entry-points."intake.drivers"]
-"forecast" = "intake_nwp.source:ForecastSource"
-"nowcast" = "intake_nwp.source:NowcastSource"
+"nwp_forecast" = "intake_nwp.source:ForecastSource"
+"nwp_nowcast" = "intake_nwp.source:NowcastSource"
+"herbie_forecast" = "intake_nwp.source:ForecastSource"
+"herbie_nowcast" = "intake_nwp.source:NowcastSource"
 
 [tool.setuptools.dynamic]
 version = {attr = "intake_nwp.__version__"}

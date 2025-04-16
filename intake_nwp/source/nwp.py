@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 
-from intake_nwp.source import DataSourceBase
+from intake_nwp.source.base import DataSourceBase
 from intake_nwp.utils import round_time
 
 

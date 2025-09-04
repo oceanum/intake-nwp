@@ -95,8 +95,6 @@ def test_forecast_expected_time_size():
     )
     with pytest.raises(ValueError):
         source.to_dask()
-    # assert dset.time.size == 3
-    # assert "icecsfc" in dset
 
 
 @pytest.mark.parametrize("dataset_id", ["fc_gfs_icec", "nc_gfs_icec"])

@@ -72,6 +72,7 @@ class ForecastSource(DataSourceBase):
         sorted=False,
         metadata=None,
         check_inventory=True,
+        expected_time_size=None,
         verbose=False,
         **kwargs
     ):
@@ -87,6 +88,7 @@ class ForecastSource(DataSourceBase):
         self.mapping = mapping
         self.sorted = sorted
         self.check_inventory = check_inventory
+        self.expected_time_size = expected_time_size
         self.verbose=verbose
 
         self._fxx = fxx
@@ -211,6 +213,14 @@ class ForecastSource(DataSourceBase):
             raise ValueError(
                 f"Data not available for the requested forecast lead time for {self}, "
                 f"requested: {times[0]} - {t1}, available: {times[0]} - {times[-1]}"
+            )
+
+        # Ensure the time size is as expected
+        if self.expected_time_size is not None and len(times) != self.expected_time_size:
+            raise ValueError(
+                f"The expected time size for the dataset is {self.expected_time_size}, "
+                f"but the actual time size is {len(times)}, timesteps are likely "
+                f"missing. Dataset times: {times}"
             )
 
         # Sorting

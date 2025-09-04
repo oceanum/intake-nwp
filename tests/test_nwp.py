@@ -80,6 +80,25 @@ def test_nowcast():
     assert dset.time.size == 4
 
 
+def test_forecast_expected_time_size():
+    source = ForecastSource(
+        cycle="20231122T00",
+        model="gfs",
+        fxx=[0, 1, 2],
+        priority=["google", "aws", "nomads", "azure"],
+        product="pgrb2.0p25",
+        pattern="ICEC",
+        mapping={"longitude": "lon", "latitude": "lat", "siconc": "icecsfc"},
+        sorted=True,
+        max_threads="auto",
+        expected_time_size=100,
+    )
+    with pytest.raises(ValueError):
+        source.to_dask()
+    # assert dset.time.size == 3
+    # assert "icecsfc" in dset
+
+
 @pytest.mark.parametrize("dataset_id", ["fc_gfs_icec", "nc_gfs_icec"])
 def test_catalog(dataset_id):
     cat = intake.open_catalog(HERE / "catalog.yml")

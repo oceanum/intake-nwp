@@ -207,13 +207,14 @@ class ForecastSource(DataSourceBase):
         ds = ds.rename({"step": "time"}).reset_coords()
 
         # Ensure the entire lead time period requested is available
-        times = ds.time.to_index()
-        t1 = times[0] + timedelta(hours=self.fxx[-1])
-        if t1 > times[-1]:
-            raise ValueError(
-                f"Data not available for the requested forecast lead time for {self}, "
-                f"requested: {times[0]} - {t1}, available: {times[0]} - {times[-1]}"
-            )
+        if self.expected_time_size is not None:
+            times = ds.time.to_index()
+            t1 = times[0] + timedelta(hours=self.fxx[-1])
+            if t1 > times[-1]:
+                raise ValueError(
+                    f"Data not available for the requested forecast lead time for {self}, "
+                    f"requested: {times[0]} - {t1}, available: {times[0]} - {times[-1]}"
+                )
 
         # Ensure the time size is as expected
         if self.expected_time_size is not None and len(times) != self.expected_time_size:
